@@ -1,0 +1,93 @@
+-- Criar tabela tb_address
+CREATE TABLE IF NOT EXISTS tb_address (
+    id_address SERIAL NOT NULL PRIMARY KEY,
+    cep CHAR(8),
+    state VARCHAR(60),
+    city VARCHAR(60),
+    neighborhood VARCHAR(60),
+    street VARCHAR(60),
+    house_number VARCHAR(10)
+);
+
+-- Criar tabela tb_user
+CREATE TABLE IF NOT EXISTS tb_user (
+    id_user SERIAL NOT NULL PRIMARY KEY,
+    username VARCHAR(255),
+    email VARCHAR(255),
+    cpf CHAR(11),
+    nickname VARCHAR(255) UNIQUE,
+    parole VARCHAR(60),
+    fk_address INT,
+    FOREIGN KEY (fk_address) REFERENCES tb_address(id_address)
+);
+
+-- Criar tabela tb_bubble
+CREATE TABLE IF NOT EXISTS tb_bubble (
+    id_bubble SERIAL NOT NULL PRIMARY KEY,
+    headline VARCHAR(100),
+    explanation VARCHAR(500),
+    creation_date DATE,
+    category VARCHAR(10) CHECK (category IN ('SPORTS', 'MUSIC', 'GAME', 'ART', 'TECHNOLOGY', 'SCIENCE', 'CULINARY', 'READING')),
+    fk_user INT,
+    FOREIGN KEY (fk_user) REFERENCES tb_user(id_user)
+);
+
+-- Criar tabela tb_participation_bubble
+CREATE TABLE tb_participation_bubble (
+    id_participant SERIAL NOT NULL PRIMARY KEY,
+    fk_user INT,
+    fk_bubble INT,
+    FOREIGN KEY (fk_user) REFERENCES tb_user(id_user),
+    FOREIGN KEY (fk_bubble) REFERENCES tb_bubble(id_bubble)
+);
+
+
+-- Criar tabela tb_event
+CREATE TABLE IF NOT EXISTS tb_event (
+    id_event SERIAL NOT NULL PRIMARY KEY,
+    event_type VARCHAR(13) NOT NULL,
+    title VARCHAR(100),
+    moment TIMESTAMP(6),
+    duration INT,
+    fk_user INT,
+    FOREIGN KEY (fk_user) REFERENCES tb_user(id_user),
+    fk_bubble INT,
+    FOREIGN KEY (fk_bubble) REFERENCES tb_bubble(id_bubble),
+    public_place BOOLEAN,
+    people_capacity INT,
+    fk_address INT,
+    FOREIGN KEY (fk_address) REFERENCES tb_address(id_address),
+    platform VARCHAR(100),
+    url VARCHAR(200)
+);
+
+-- Criar tabela tb_participation_event
+CREATE TABLE tb_participation_event (
+    id_participant SERIAL NOT NULL PRIMARY KEY,
+    fk_user INT,
+    FOREIGN KEY (fk_user) REFERENCES tb_user(id_user),
+    fk_event INT,
+    FOREIGN KEY (fk_event) REFERENCES tb_event(id_event)
+);
+
+-- Criar tabela tb_post
+CREATE TABLE IF NOT EXISTS tb_post (
+    id_post SERIAL NOT NULL PRIMARY KEY,
+    moment TIMESTAMP(6),
+    content VARCHAR(650),
+    fk_user INT,
+    FOREIGN KEY (fk_user) REFERENCES tb_user(id_user),
+    fk_bubble INT,
+    FOREIGN KEY (fk_bubble) REFERENCES tb_bubble(id_bubble)
+);
+
+-- Criar tabela tb_comment
+CREATE TABLE IF NOT EXISTS tb_comment (
+    id_comment SERIAL NOT NULL PRIMARY KEY,
+    moment TIMESTAMP(6),
+    content VARCHAR(300),
+    fk_user INT,
+    FOREIGN KEY (fk_user) REFERENCES tb_user(id_user),
+    fk_post INT,
+    FOREIGN KEY (fk_post) REFERENCES tb_post(id_post)
+);
